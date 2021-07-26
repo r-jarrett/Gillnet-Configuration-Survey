@@ -1,0 +1,11 @@
+﻿ParticipantID,Name,Current/Past,Configuration,Species,StatAreas ,MinDepth,MaxDepth,GillnetType,PanelSize,Panels/String,HangingHeight,Scope,Hanging Ratio,Splices/Knots,Splice/KnotType,Anchors,Daytrip/Overnight,AvgSoakTime,Days/Season,BuoyLineDiameter,BridleLineDiameter,SkirtRopeDiameter,HeadRopeDiameter,FootRopeDiameter,HangingTwineDiameter,MeshMaterial
+ID number of participant (may repeat depending if they provide primary/secondary or current/past configs),Participant Name,Current (2020/2021) or past (last 5 years) gear configuration,Primary,Target species (separated by commas),Statistical fishing areas (not separated),Minimum Depth Fished (fathoms,Maximum Depth Fished (fathoms,Type of gillnet fished (Anchored Sink/Float/Drift/Tended Bait),Length of gillnet panel (feet),Number of panels in the string,Hanging Height (fathoms,Scope of Vertical Line to Depth (fathoms),Hanging Ratio,Primary Rope Connection (Knots/Splices),Type of knot or splice used,Anchor Used,"If the gear configuration is fished as a daytrip, overnight, or both",Average Soak Time (hours),Numbers of Days fished per season,Buoy Line Diameter (inch),Bridle Line Diameter (inch),Skirt Rope Diameter (inch),Head Rope Diameter (inch),Foot Rope Diameter (inch),Hanging Twine Diameter (inch),Material used for mesh (monofilament/multifilament)
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,

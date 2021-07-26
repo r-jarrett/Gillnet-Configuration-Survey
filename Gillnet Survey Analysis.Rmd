@@ -1,0 +1,398 @@
+---
+title: "Gillnet Configuration Survey"
+author: "Robert Jarrett"
+date: "5/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, include=FALSE}
+# load libraries
+library(ggplot2)
+library(raster)
+library(tidyr)
+library(sf)
+library(dplyr)
+library(plotrix)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(scales)
+```
+
+```{r}
+#clear environment
+rm(list=ls())
+```
+
+```{r}
+#import data
+gillnet.exampledata = read.csv("Data/Example Responses.csv")
+# gillnet = gillnet.exampledata
+gillnet = read.csv("Data/Cleaned Responses.csv")
+statareas = st_read("Stat Area Shapefile/StatAreas.shp")
+```
+
+```{r}
+#set default theme and colors for plots
+theme_set(theme_classic())
+update_geom_defaults("boxplot", list(fill = "lightblue2"))
+update_geom_defaults("bar", list(fill = "lightblue2", color = "black"))
+```
+
+```{r}
+#subset survey results to only include current gillnet configurations
+current = subset(gillnet, Current.Past == "Current")
+```
+
+```{r}
+#separate the individual Statistical Areas fished for each respondent
+speciessep = separate_rows(current, Species, sep=",")
+```
+
+## Fisheries Species
+```{r}
+#plot a stacked barplot of primary and secondary species
+ggplot() +
+  stat_count(data=speciessep, aes(x= Species, fill=Configuration), position = 'stack') +
+  scale_fill_manual(values=c("firebrick", "lightblue2"))
+  labs(title = "Target Species of Primary and Secondary Gillnet Configurations", y = "Number of Fisherman", fill = "Configuration")
+
+#### How to address a fisherman that fishes for the same species in both the primary and secondary configuration
+```
+
+## Statisitcal Areas
+```{r}
+#separate the individual Statistical Areas fished for each respondent
+x = separate_rows(current, StatAreas, sep=",")
+areaIDs = x$StatAreas
+```
+
+```{r}
+#calculate count for each Statistical Area fished
+countareas = as.data.frame(table(areaIDs))
+names(countareas) = c("Id", "count")
+
+#combine the count data and the shapefile
+plotareas = merge(statareas, countareas, by.x="Id", all.x = TRUE)
+#set NAs to 0
+plotareas$count[is.na(plotareas$count)] = 0
+```
+
+```{r}
+#plot heatmap of statistical areas fished
+ggplot() +
+  geom_sf(data=plotareas, aes(fill=count)) +
+  scale_fill_distiller(direction=1, palette="Reds", aesthetics = "fill") +
+  labs(title = "Statisical Areas fished by Survey Respondents", fill = "Number of \nRespondents")
+
+#need to make sure that there aren't any duplicates being plotted across secondary or past configurations
+```
+
+## Minimum Depth
+```{r}
+#plot boxplot of Minimum Depth by Gillnet Type
+ggplot() +
+  geom_boxplot(data=current, aes(x=GillnetType, y=MinDepth)) +
+  labs(title = "Minimum Depth Fished by Gillnet Type", x = "Gillnet Type", y = "Minimum Depth Fished (fathoms)")
+
+#plot boxplot of Minimum Depth by Species
+ggplot() +
+  geom_boxplot(data=speciessep, aes(x=Species, y=MinDepth)) +
+  labs(title = "Minimum Depth Fished by Target Species", x = "Species", y = "Minimum Depth Fished (fathoms)")
+```
+
+## Maximum Depth
+```{r}
+#plot boxplot of Maximum Depth by Gillnet type
+ggplot() +
+  geom_boxplot(data=current, aes(x=GillnetType, y=MaxDepth)) +
+  labs(title = "Maximum Depth Fished by Target Species", x = "Gillnet Type", y = "Maximum Depth Fished (fathoms)")
+
+#plot boxplot of Maximum Depth by Species
+ggplot() +
+  geom_boxplot(data=speciessep, aes(x=Species, y=MaxDepth)) +
+  labs(title = "Maximum Depth Fished by Target Species", x = "Species", y = "Maximum Depth Fished (fathoms)")
+```
+
+## Panel Size
+```{r}
+#plot barplot of Panel Size by Gillnet Type
+ggplot(data=current, aes(x=GillnetType, y=PanelSize)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Panel Size by Gillnet Type", x = "Gillnet Type", y = "Panel Size (ft)")
+
+#plot barplot of Panel Size by Species
+ggplot(data=speciessep, aes(x=Species, y=PanelSize)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Panel Size by Target Species", x = "Species", y = "Panel Size (ft)")
+```
+
+## Number of Panels in a String
+```{r}
+#plot boxplot of Number of Panels in a String by Gillnet Type
+ggplot() +
+  geom_boxplot(data=current, aes(x=GillnetType, y=Panels.String)) +
+  labs(title = "Number of Panels in a String by Gillnet Type", x = "Species", y = "Number of Panels in a String")
+
+#plot boxplot of Number of Panels in a String by Species
+ggplot() +
+  geom_boxplot(data=speciessep, aes(x=Species, y=Panels.String)) +
+  labs(title = "Number of Panels in a String by Target Species", x = "Species", y = "Number of Panels in a String")
+```
+
+## Hanging Height
+```{r}
+#plot barplot of Hanging Height by Gillnet Type
+ggplot(data=current, aes(x=GillnetType, y=HangingHeight)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Hanging Height by Target Species", x = "Species", y = "Hanging Height (fathoms)")
+
+#plot barplot of Hanging Height by Species
+ggplot(data=speciessep, aes(x=Species, y=HangingHeight)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Hanging Height by Target Species", x = "Species", y = "Hanging Height (fathoms)")
+```
+
+## Splices/Knots
+#### Should theses be done as a percentage instead?
+```{r}
+#plot barplot of Splices/Knots by Gillnet Type
+ggplot() +
+  geom_bar(data=current, aes(x=Splices.Knots, fill=Splice.KnotType), position="stack") +
+  facet_wrap(~GillnetType) +
+  labs(title = "Splice vs. Knot Usage by Gillnet Type", x = "Gillnet Type", y = "Number of Fisherman Using", 
+       fill = "Splice/Knot Type") +
+  scale_fill_brewer(palette = "RdBu") 
+
+#plot barplot of Splices/Knots by Species
+ggplot() +
+  geom_bar(data=speciessep, aes(x=Splices.Knots, fill=Splice.KnotType), position="stack") +
+  facet_wrap(~Species) +
+   labs(title = "Splice vs. Knot Usage by Target Species", x = "Species", y = "Number of Fisherman Using", 
+        fill = "Splice/Knot Type") +
+  scale_fill_brewer(palette = "RdBu") 
+```
+
+## Anchors
+#### Should theses be done as a percentage instead?
+```{r}
+#plot barplot of Anchors by Gillnet Type
+ggplot() +
+  geom_bar(data=current, aes(x=GillnetType, fill=Anchors), position="stack") +
+  labs(title = "Anchor Configuration by Gillnet Type", x = "Gillnet Type", y = "Number of Fisherman Using", 
+        fill = "Anchor Configuration") +
+  scale_fill_brewer(palette = "Blues")
+
+#plot barplot of Anchors by Species
+ggplot() +
+  geom_bar(data=speciessep, aes(x=Species, fill=Anchors), position="stack") +
+  labs(title = "Anchor Configuration by Target Species", x = "Species", y = "Number of Fisherman Using", 
+        fill = "Anchor Configuration") +
+  scale_fill_brewer(palette = "Blues")
+```
+
+## Daytrip/Overnight
+#### Should theses be done as a percentage instead?
+```{r}
+#reorder the Daytrip/Overnight factors
+current$Daytrip.Overnight = factor(current$Daytrip.Overnight, levels = c("Daytrip", "Overnight", 'Both'))
+speciessep$Daytrip.Overnight = factor(speciessep$Daytrip.Overnight, levels = c("Daytrip", "Overnight", "Both"))
+```
+
+```{r}
+#plot barplot of Daytrip/Overnight by Gillnet Type
+ggplot() +
+  geom_bar(data=current, aes(x=Daytrip.Overnight), position=position_dodge()) +
+  facet_wrap(~GillnetType) +
+  labs(title = "Trip Type by Gillnet Type", x = "Gillnet Type", y = "Number of Fisherman Using")
+
+#plot barplot of Daytrip/Overnight by Species
+ggplot() +
+  geom_bar(data=speciessep, aes(x=Daytrip.Overnight), position=position_dodge()) +
+  facet_wrap(~Species) +
+  labs(title = "Trip Type by Target Species", x = "Species", y = "Number of Fisherman Using")
+```
+
+## Soak Time
+```{r}
+#plot barplot of Soak Time by Gillnet Type
+ggplot(data=current, aes(x=GillnetType, y=AvgSoakTime)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Average Soak Time by Gillnet Type", x = "Gillnet Type", y = "Average Soak Time (hrs)")
+
+#plot barplot of Soak Time by Species
+ggplot(data=speciessep, aes(x=Species, y=AvgSoakTime)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Average Soak Time by Target Species", x = "Species", y = "Average Soak Time (hrs)")
+```
+
+## Days per Season
+```{r}
+#plot barplot of Days per Season by Gillnet Type
+ggplot(data=current, aes(x=GillnetType, y=Days.Season)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Days Fished per Season by Gillnet Type", x = "Gillnet Type", y = "Days Fished per Season")
+
+#plot barplot of Days per Season by Species
+ggplot(data=speciessep, aes(x=Species, y=Days.Season)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Days Fished per Season by Target Species", x = "Species", y = "Days Fished per Season")
+```
+
+## Rope Diameters
+```{r}
+#create subsetted dataframe for just Rope Diameter data
+RopeD = current[c("BuoyLineDiameter", "BridleLineDiameter", "SkirtRopeDiameter", "HeadRopeDiameter", "FootRopeDiameter")]
+#take mean and standard error of each rope type
+AvgRopeD = apply(RopeD, 2, mean)
+SERopeD = apply(RopeD, 2, std.error)
+#create vector of rope names for plot
+ropenames = c("Buoy Line", "Bridle Line", "Skirt Rope", "Head Rope", "Foot Rope")
+
+#plot barplot of Average Rope Diameter
+ggplot(data = NULL, aes(x = ropenames, y = AvgRopeD)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  geom_errorbar(aes(ymin = AvgRopeD - SERopeD, ymax = AvgRopeD + SERopeD), width = 0.2,) +
+  labs(title = "Diameters of Gillnet Rope Types", x = "Rope Type", y = "Rope Diameter (in)")
+```
+
+## Buoy Line
+```{r}
+#plot barplot of Buoy Line Diameter by Gillnet Type
+buoyA = ggplot(data=current, aes(x=GillnetType, y=BuoyLineDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Buoy Line Diameter by Gillnet Type", x = "Gillnet Type", y = "Rope Diameter (in)")
+buoyA
+
+#plot barplot of Buoy Line Diameter by Species
+buoyB = ggplot(data=speciessep, aes(x=Species, y=BuoyLineDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Buoy Line Diameter by Target Species", x = "Target Species", y = "Rope Diameter (in)")
+buoyB
+```
+
+## Bridle Line
+```{r}
+#plot barplot of Bridle Line Diameter by Gillnet Type
+bridleA = ggplot(data=current, aes(x=GillnetType, y=BridleLineDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Bridle Line Diameter by Gillnet Type", x = "Gillnet Type", y = "Rope Diameter (in)")
+bridleA
+
+#plot barplot of Bridle Line Diameter by Species
+bridleB = ggplot(data=speciessep, aes(x=Species, y=BridleLineDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Bridle Line Diameter by Target Species", x = "Target Species", y = "Rope Diameter (in)")
+bridleB
+```
+
+## Skirt Rope
+```{r}
+#plot barplot of Skirt Rope Diameter by Gillnet Type
+skirtA = ggplot(data=current, aes(x=GillnetType, y=SkirtRopeDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Skirt Rope Diameter by Gillnet Type", x = "Gillnet Type", y = "Rope Diameter (in)")
+skirtA
+
+#plot barplot of Bridle Line Diameter by Species
+skirtB = ggplot(data=speciessep, aes(x=Species, y=SkirtRopeDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Skirt Rope Diameter by Target Species", x = "Target Species", y = "Rope Diameter (in)")
+skirtB
+```
+
+## Head Rope
+```{r}
+#plot barplot of Head Rope Diameter by Gillnet Type
+headA = ggplot(data=current, aes(x=GillnetType, y=HeadRopeDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Head Rope Diameter by Gillnet Type", x = "Gillnet Type", y = "Rope Diameter (in)")
+headA
+
+#plot barplot of Bridle Line Diameter by Species
+headB = ggplot(data=speciessep, aes(x=Species, y=HeadRopeDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Head Rope Diameter by Target Species", x = "Target Species", y = "Rope Diameter (in)")
+headB
+```
+
+## Foot Rope
+```{r}
+#plot barplot of Foot Rope Diameter by Gillnet Type
+footA = ggplot(data=current, aes(x=GillnetType, y=FootRopeDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Foot Rope Diameter by Gillnet Type", x = "Gillnet Type", y = "Rope Diameter (in)")
+footA
+
+#plot barplot of Bridle Line Diameter by Species
+footB = ggplot(data=speciessep, aes(x=Species, y=FootRopeDiameter)) +
+  stat_summary(geom = "bar", fun.y = mean, width = 0.5) +
+  stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.25) +
+  labs(title = "Foot Rope Diameter by Target Species", x = "Target Species", y = "Rope Diameter (in)") 
+footB
+```
+
+```{r}
+#modify existing Rope Diameter plots to remove axis labels and standardize y axis limits
+p1 = buoyA + labs(title = "Buoy Line", x = NULL, y = NULL) + ylim(0, 1)
+p2 = bridleA + labs(title = "Bridle Line", x = NULL, y = NULL) + ylim(0, 1)
+p3 = skirtA + labs(title = "Skirt Rope", x = NULL, y = NULL) + ylim(0, 1)
+p4 = headA + labs(title = "Head Rope", x = NULL, y = NULL) + ylim(0, 1)
+p5 = footA + labs(title = "Foot Rope", x = NULL, y = NULL) + ylim(0, 1)
+
+p6 = buoyB + labs(title = "Buoy Line", x = NULL, y = NULL) + ylim(0, 1)
+p7 = bridleB + labs(title = "Bridle Line", x = NULL, y = NULL) + ylim(0, 1)
+p8 = skirtB + labs(title = "Skirt Rope", x = NULL, y = NULL) + ylim(0, 1)
+p9 = headB + labs(title = "Head Rope", x = NULL, y = NULL) + ylim(0, 1)
+p10 = footB + labs(title = "Foot Rope", x = NULL, y = NULL) + ylim(0, 1)
+
+#create labels for combined plot
+title1 = text_grob("Rope Diameter by Gillnet Type", size = 15, face = "bold")
+title2 = text_grob("Rope Diameter by Target Species", size = 15, face = "bold")
+bottom1 = text_grob("Gillnet Type", size = 15)
+bottom2 = text_grob("Target Species", size = 15)
+leftlab = text_grob("Rope Diameter (in)", size = 15, rot = 90)
+
+#plot combined plots for Rope Diameters
+grid.arrange(p1, p2, p3, p4, p5,  nrow = 2, top = title1, bottom = bottom1, left = leftlab)
+grid.arrange(p6, p7, p8, p9, p10, nrow = 2, top = title2, bottom = bottom2, left = leftlab)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

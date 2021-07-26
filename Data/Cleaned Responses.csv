@@ -1,0 +1,11 @@
+﻿ParticipantID,Name,Current/Past,Configuration,Species,StatAreas ,MinDepth,MaxDepth,GillnetType,PanelSize,Panels/String,HangingHeight,Scope,Hanging Ratio,Splices/Knots,Splice/KnotType,Anchors,Daytrip/Overnight,AvgSoakTime,Days/Season,BuoyLineDiameter,BridleLineDiameter,SkirtRopeDiameter,HeadRopeDiameter,FootRopeDiameter,HangingTwineDiameter,MeshMaterial
+1,Charlie Dodge,Current,Primary,"Winter Skate,Monkfish,Dogfish","521,537,534,541",15,125,Anchored Sink Gillnet,300,15,1,2-3 to 1,,Splices,Short,Two 22-lb Danforth Anchors,Both,,165,0.38,0.38,,,,,Monofilament nylon
+2,Jan Margeson,Current,Primary,Winter Skate,"521,537,526",100,120,Anchored Sink Gillnet,300,15,1,1.5,3 to 1,Splices,Regular,Two 40-lb Danforth Anchors,Daytrip,24,130,0.38,0.38,0.38,0.38,0.38,"<1/16""",Monofilament nylon
+2,Jan Margeson,Past,Secondary,"Winter Skate,Monkfish,Dogfish","521,537,526",100,120,Anchored Sink Gillnet,300,15,1,1.5,3 to 1,Splices,Butt,Two 40-lb Danforth Anchors,Daytrip,24,130,0.38,0.38,0.38,0.38,0.38,"<1/16""",Monofilament nylon
+3,Greg Connors,Current,Primary,"Monkfish,Skate",537521,10,110,Anchored Sink Gillnet,300,15,0,2:1,"""on the half"", 4ft tie downs every 30ft",Knots,Overhand,Two 22lb Danforths w/ 3 ft of chain,Both,48,140,0.38,0.38,0.5,0.38,,,Monofilament nylon
+3,Greg Connors,Current,Secondary,"Dogfish,Groundfish",537521,10,110,Anchored Sink Gillnet,300,10,0,2:1,"""on the half"", 4ft tie downs every 30ft",Knots,Overhand,Two 22lb Danforths w/ 3 ft of chain,Both,1,140,0.38,0.38,0.5,0.38,,,Monofilament nylon
+4,Terry Alexander,Current,Primary,"Pollock,Hake,Cod","513,514,515",50,130,Anchored Sink Gillnet,300,20,1.5,1.5 to 1,50%,Splices,Blunt,Two 22-lb Danforth Anchors,Overnight,17,160,0.38,0.38,0.38,0.38,0.38,1/21,Multifilament nylon
+4,Terry Alexander,Past,Primary,Pollock,"513,514,515",50,130,Anchored Sink Gillnet,300,20,1.5,1.5 to 1,,Splices,Blunt,Two 22-lb Danforth Anchors,Overnight,17,160,0.38,0.38,0.38,0.38,0.38,1/21,Multifilament nylon
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
